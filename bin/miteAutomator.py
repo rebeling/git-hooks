@@ -1,7 +1,7 @@
 import re
 import urllib2
 import json
-import sys
+import sys, os
 import ConfigParser
 import argparse
 import select
@@ -92,8 +92,12 @@ if __name__ == '__main__':
     parser.add_argument('--config', '-c', dest='configfile', action='store', default="mite.config", help='Configfile for Mite')
     args = parser.parse_args()
 
-    c = ConfigParser.RawConfigParser()
-    c.read(args.configfile)
+    try:
+        c = ConfigParser.RawConfigParser()
+        c.read(args.configfile)
+    except:
+        sys.stderr.write("Could not load configfile %s" % args.configfile)
+        sys.exit(1)
     
     if select.select([sys.stdin,],[],[],0.0)[0]:
         timestring = sys.stdin.read()
@@ -105,6 +109,12 @@ if __name__ == '__main__':
     baseuri = c.get(section, "baseuri") if c.has_section(section) and c.has_option(section, "baseuri") else None
     project = c.get(section, "project") if c.has_section(section) and c.has_option(section, "project") else None
     service = c.get(section, "service") if c.has_section(section) and c.has_option(section, "service") else None
-
+    
+    if not apikey or not baseuri:
+        sys.stderr.write("Could not get Apikey and/or baseuri from configfile")
+        sys.exit(1)
+    
     m = Mite(apiKey=apikey, baseUrl=baseuri)
-    m.addTime(timestring, project=project, service=service)
+    if m.addTime(timestring, project=project, service=service):
+        sys.exit(0)
+    sys.exit(255)

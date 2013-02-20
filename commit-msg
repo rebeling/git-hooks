@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-SCRIPTS=/Users/thospy/Scripts
+SCRIPTS=`pwd`/git-hooks/bin
 
 ##### 1. Checking for existence of Issue Id in commit message
 ##
@@ -13,4 +13,4 @@ fi
 
 ##### 2. Extract Time information from Commitmessage and enter it at mite
 ##
-cat $1 | python $SCRIPTS/miteAutomator.py -c $SCRIPTS/mite.config
+cat $1 | python $SCRIPTS/miteAutomator.py -c $SCRIPTS/../etc/mite.config

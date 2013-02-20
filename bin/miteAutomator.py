@@ -17,15 +17,24 @@ class Mite(object):
 
     def getUserId(self, name):
         x = self.__request('/users.json?name=%s' % name)
-        return x[0]['user']['id']
+        try:
+            return x[0]['user']['id']
+        except:
+            return None
                 
     def getProjectId(self, name):
         x = self.__request('/projects.json?name=%s' % name)
-        return x[0]['project']['id']
+        try:
+            return x[0]['project']['id']
+        except:
+            return None
     
     def getServiceId(self, name):
         x = self.__request('/services.json?name=%s' % name)
-        return x[0]['service']['id']
+        try:
+            return x[0]['service']['id']
+        except:
+            return None
     
     def addTime(self,note, project=None, service=None):
         if project: projectId = self.getProjectId(project)

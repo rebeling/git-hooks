@@ -1,0 +1,5 @@
+[mite]
+apikey = 000000ABCDb
+baseuri = https://USERNAME.mite.yo.lk
+project = Projectname 
+service = Servicename 

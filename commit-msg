@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+SCRIPTS=/Users/thospy/Scripts
+
+##### 1. Checking for existence of Issue Id in commit message
+##
+PY_REGEX="import re;x = re.search('(?<=#)(([A-Z]{3,5}-[0-9]*)|([0-9]*))', '`cat $1`'); print x.group() if x else ''"
+FOUND=$( python -c "${PY_REGEX}" )
+if [ -z "$FOUND" ]; then
+        echo >&2 Could not find a Bug ID in your commit message
+        exit 1
+fi
+
+##### 2. Extract Time information from Commitmessage and enter it at mite
+##
+cat $1 | python $SCRIPTS/miteAutomator.py -c $SCRIPTS/mite.config

@@ -40,9 +40,8 @@ class HipChat(object):
         return self._doIt(url,data)
 
 if __name__ == '__main__':
-    # echo "This a text @1h20m with time in it" | python miteAutomator.py -c mite.config 
     parser = argparse.ArgumentParser(description='HipChat Message client')
-    parser.add_argument('--config', '-c', dest='configfile', action='store', default="mite.config", help='Configfile for Mite')
+    parser.add_argument('--config', '-c', dest='configfile', action='store', default="hipchat.config", help='Configfile for HipChat')
     args = parser.parse_args()
     
     try:
@@ -64,7 +63,7 @@ if __name__ == '__main__':
     sendername = c.get(section, "sendername") if c.has_section(section) and c.has_option(section, "sendername") else None
 
     if not token or not roomname:
-        sys.stderr.write("Could not get Apikey and/or room name from configfile\n")
+        sys.stderr.write("Could not get token and/or room name from configfile\n")
         sys.exit(1)
     
     hp = HipChat(token)

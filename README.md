@@ -14,4 +14,14 @@ Currently supporting:
 * Checking if Bug Id has been provided (#1234 or #ABC-1234)
 * Getting time from commit message and report it to mite.yo.lk
 * Sending Message to HipChat
- 
+
+Mite
+----
+
+Time gets parsed in the following formats. Every line reports 2hours and 5 minutes:
+
+    "Lorem ipsum dolor sit amet @2h5m Lorem ipsum dolor sit amet" 
+    "Lorem ipsum dolor sit amet @2hours5minuts Lorem ipsum dolor sit amet"
+    "Lorem ipsum dolor sit amet @2h5min Lorem ipsum dolor sit amet"
+    "Lorem ipsum dolor sit amet @2:5 Lorem ipsum dolor sit amet"
+    "Lorem ipsum dolor sit amet @125 Lorem ipsum dolor sit amet"

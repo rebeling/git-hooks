@@ -1,0 +1,4 @@
+[hipchat]
+token = 000000
+roomname = Developers
+sendername = Git Commiter

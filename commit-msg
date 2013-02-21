@@ -14,3 +14,7 @@ fi
 ##### 2. Extract Time information from Commitmessage and enter it at mite
 ##
 cat $1 | python $SCRIPTS/miteAutomator.py -c $SCRIPTS/../etc/mite.config
+
+##### 3. Send Commit Message to HipChat 
+##
+cat $1 | python $SCRIPTS/hipchatClient.py -c $SCRIPTS/../etc/hipchat.config

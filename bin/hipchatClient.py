@@ -45,6 +45,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     try:
+        f = open(args.configfile, "r")
+        f.close()
         c = ConfigParser.RawConfigParser()
         c.read(args.configfile)
     except:

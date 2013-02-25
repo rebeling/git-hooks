@@ -48,8 +48,8 @@ if __name__ == '__main__':
         c = ConfigParser.RawConfigParser()
         c.read(args.configfile)
     except:
-        sys.stderr.write("Could not load configfile %s\n" % args.configfile)
-        sys.exit(1)
+        sys.stdout.write("There is no configfile (%s) ignoring this hook...\n" % args.configfile)
+        sys.exit(0)
 
     if select.select([sys.stdin,],[],[],0.0)[0]:
         message = sys.stdin.read()

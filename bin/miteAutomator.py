@@ -36,7 +36,7 @@ class Mite(object):
         except:
             return None
     
-    def addTime(self,note, project=None, service=None):
+    def addTime(self,note, project=None, service=None, publish=True,jira=True):
         if project: projectId = self.getProjectId(project)
         else: projectId = 0
         if service: serviceId = self.getServiceId(service)
@@ -55,7 +55,18 @@ class Mite(object):
             minutes = (int(x[0]) * 60) + int(x[1])
         elif "m" in timestring or "h" in timestring:
             timestring = "".join(re.findall("\d|h|m+", timestring))
-            minutes = (int(re.search("\d*(?=h)", timestring).group()) * 60) + int(re.search("\d*(?=m)", timestring).group())
+            h = re.search("\d*(?=h)", timestring)
+            if h:
+                h = int(h.group())
+            else:
+                h = 0
+            
+            m = re.search("\d*(?=m)", timestring)
+            if m:
+                m = int(m.group())
+            else:
+                m = 0
+            minutes = (h * 60) + m
         else:
             minutes = int("".join(re.findall("\d+", timestring)))
 
@@ -69,13 +80,27 @@ class Mite(object):
             "project_id":projectId,
             #"user-id":1234
         }}
-        x = self.__request('/time_entries.json', json.dumps(data))
+        x = False
+        if publish:
+            x = self.__request('/time_entries.json', json.dumps(data))
         
         if x:
             project = x['time_entry']['project_name'] if 'project_name' in x['time_entry'] else None
             print "Added %i minutes for project %s" % (x['time_entry']['minutes'],project)
-            return True
-        return False
+        
+        if publish and not x:
+            return False
+                
+        if jira:
+            return self.jiraTime(data)
+        
+        return True
+    
+    def jiraTime(self, data):
+        h = int(data['time-entry']['minutes']/60)
+        m = int(data['time-entry']['minutes'] - (h*60))
+        newMessage = "%s #time %ih %im" % ("".join(data['time-entry']['note'].splitlines()), h, m)
+        return newMessage
         
     def __request(self, url, body = None, supressError = False):
         response = None
@@ -104,6 +129,8 @@ if __name__ == '__main__':
     # echo "This a text @1h20m with time in it" | python miteAutomator.py -c mite.config 
     parser = argparse.ArgumentParser(description='Adds Time Information to mite')
     parser.add_argument('--config', '-c', dest='configfile', action='store', default="mite.config", help='Configfile for Mite')
+    parser.add_argument('--messagefile', '-m', dest='messagefile', action='store', default=None, help='The file containing the commit message')
+
     args = parser.parse_args()
 
     try:
@@ -126,12 +153,23 @@ if __name__ == '__main__':
     baseuri = c.get(section, "baseuri") if c.has_section(section) and c.has_option(section, "baseuri") else None
     project = c.get(section, "project") if c.has_section(section) and c.has_option(section, "project") else None
     service = c.get(section, "service") if c.has_section(section) and c.has_option(section, "service") else None
+    jiratime = int(c.get(section, "jiratime")) if c.has_section(section) and c.has_option(section, "jiratime") else None
+    onlyjiratime = int(c.get(section, "onlyjiratime")) if c.has_section(section) and c.has_option(section, "onlyjiratime") else None
     
-    if not apikey or not baseuri:
+    jiratime = True if jiratime else False
+    publish = False if onlyjiratime else True
+
+    if (not apikey or not baseuri) and not onlyjiratime:
         sys.stderr.write("Could not get Apikey and/or baseuri from configfile\n")
         sys.exit(1)
     
     m = Mite(apiKey=apikey, baseUrl=baseuri)
-    if m.addTime(timestring, project=project, service=service):
+    
+    x = m.addTime(timestring, project=project, service=service, jira=jiratime, publish=publish)
+    if x:
+        if args.messagefile and jiratime:
+            f = open(args.messagefile, "w")
+            f.write(x)
+            f.close()
         sys.exit(0)
     sys.exit(255)
